@@ -77,7 +77,7 @@ client.onmessage = (raw,data) => {
   //修改了 whisper 的cmd，添加了个 msg参数，显示用户私信的内容，如果是机器人私信用户，就没有这个
   //还添加了nick
   /*
-    if (data.cmd == "emote") {
+    if (data.cmd == "whisper" && data.msg) {
       client.chat(`${data.nick}刚刚私信我说${data.msg}`)
     }
   */
