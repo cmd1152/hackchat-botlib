@@ -117,12 +117,10 @@ class Client {
     this.customId = 0;
   }
   join(pack) {
-    return new Promise(resolve => {
-      if (this._ws.readyState !== 1) resolve(false); //连接没有打开，加入失败
-      pack.cmd = "join";
-      this.channel = pack.channel;
-      this._send(pack);
-    })
+    if (this._ws.readyState !== 1) return false; //连接没有打开，加入失败
+    pack.cmd = "join";
+    this.channel = pack.channel;
+    this._send(pack);
   }
   _send(obj) {
     this._ws.send(JSON.stringify(obj));
@@ -136,6 +134,7 @@ class Client {
       cmd: 'chat',
       text: text
     }
+    if (this.channel == "purgatory") pack.cmd == "emote";
     if (custom_id) pack.customId = custom_id;
     this._send(pack);
     return true;
@@ -153,6 +152,37 @@ class Client {
   getcustomId() {
     return customId.toString();
     customId += 1;
+  }
+  isTrip(trip) {
+    return /^[a-zA-Z0-9+/]{6}$/.test(trip);
+  }
+  isHash(hash) {
+    return /^[a-zA-Z0-9+/]{15}$/.test(hash);
+  }
+  isNick(nick) {
+    return /^[a-zA-Z0-9_]{1,24}$/.test(nick);
+  }
+  selTrip(trip) {
+    return this.users.filter((user)=>{
+      return user.trip == trip;
+    })||[]
+  }
+  selHash(hash) {
+    return this.users.filter((user)=>{
+      return user.hash == hash;
+    })||[]
+  }
+  selNick(nick) {
+    return this.users.find((user)=>{
+      return user.nick == nick;
+    })
+  }
+  whisper(to,text) {
+    this._send({
+      cmd: 'whisper',
+      nick: to,
+      text: text
+    })
   }
 }
 
