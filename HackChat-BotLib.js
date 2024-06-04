@@ -170,7 +170,7 @@ class Client {
     })
   }
   getcustomId() {
-    return this.customId.toString();
+    return this.customId.toString(36);
     this.customId += 1;
   }
   isTrip(trip) {
