@@ -105,6 +105,26 @@ class Client {
       if (hc.cmd == "info" && hc.type == "whisper" && typeof hc.from == "string") {
         hc.nick = hc.from;
         hc.msg = hc.text.substring(hc.from.length+12);
+        hc.cmd = hc.type;
+        delete hc.type;
+      }
+      if (hc.cmd == "info" && /^([a-zA-Z0-9_]{1,24}) invited you to/.test(hc.text)) {
+        let inv = hc.text.match(/^([a-zA-Z0-9_]{1,24}) invited you to/);
+        return this.onmessage(
+          event.data,
+          {
+            cmd: 'invite',
+            nick: inv[1],
+            to: hc.text.substring(inv[1].length + 17)
+          }
+        )
+      }
+      if (hc.cmd == "updateMessage") {
+        let updateBy = this.users.find((user)=>{
+          return user.userid == hc.userid;
+        })
+        hc.nick = updateBy.nick;
+        hc.trip = updateBy.trip;
       }
       this.onmessage(event.data,hc);
     }
@@ -176,6 +196,14 @@ class Client {
     return this.users.find((user)=>{
       return user.nick == nick;
     })
+  }
+  invite(nick,to) {
+    let pack = {
+      cmd: 'invite',
+      nick: nick
+    }
+    if (to) pack.to = to;
+    this._send(pack);
   }
   whisper(to,text) {
     this._send({

@@ -3,12 +3,11 @@ let client = new Client("wss://hack.chat/chat-ws");
 let join_channel = "your-channel";
 
 client.onjoin = () => { 
-  client.join({  //发送加入数据包
+  client.join({
     channel: join_channel,
     nick: 'my_bot',
     password: '123456'
   })
-  //也可以读取 client.joined 判断有没有加入频道
 }
 
 client.onmessage = (raw, json) => {
@@ -26,4 +25,10 @@ client.onjoined = () => {
 }
 
 client.ping = 10000;
+client.onchangechannel = (channel) => {
+  client.close("被踢出或者移动到了"+channel);
+}
 
+client.onclose = (reason) => {
+  console.log(`连接断开`,reason)
+}
