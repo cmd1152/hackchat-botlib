@@ -150,8 +150,8 @@ class Client {
     })
   }
   getcustomId() {
-    return customId.toString();
-    customId += 1;
+    return this.customId.toString();
+    this.customId += 1;
   }
   isTrip(trip) {
     return /^[a-zA-Z0-9+/]{6}$/.test(trip);
