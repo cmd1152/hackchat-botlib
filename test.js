@@ -19,13 +19,14 @@ client.onjoined = () => {
 }
 
 client.onmessage = (raw, json) => {
-  if (json.cmd == "chat" && json.text.includes("6") && json.nick !== client.nick) {
-    let id = client.getcustomId()
-    client.chat(client.reply(json),id);
-    ["我注意到","你说了", "一句“6”","，","最近你", "过得如何？"].forEach((t,i)=>{
-      setTimeout(()=>{
-        client.updatemessage(id,'append',t);
-      },i*3000)
-    })
+  console.log(json);
+}
+
+client.cmdstart = ":";
+client.command = {
+  test: {
+    run: function(args, info, back, whisper) {
+      back(`用户信息:\n\`\`\`\n${JSON.stringify(info)}\n\`\`\`\n是私信调用：${whisper}\n命令参数：${args.join(" ")} （长度：${args.length}）`);
+    }
   }
 }

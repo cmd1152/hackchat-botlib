@@ -129,6 +129,7 @@ class Client {
       if (this.cmdstart !== false) {
         let originText = hc.text;
         if (hc.cmd == "whisper") originText = hc.msg; //前面有扩展;
+        if (!originText) return;
         if (originText.startsWith(this.cmdstart)) {
           let originCmd = originText.substring(this.cmdstart.length).split(" ");
           let runcmd = originCmd.shift();
@@ -136,7 +137,7 @@ class Client {
             runcmd,
             originCmd,
             this.selNick(hc.nick),
-            hc.cmd == "whisper"?(text,e=false)=>{this.whisper(hc.nick,`${e?"\x00\n":""}${text}`)}:(text,e)=>{this.chat(`${e?"":`@{hc.nick} `}${text}`)},
+            hc.cmd == "whisper"?(text,e=false)=>{this.whisper(hc.nick,`${e?"\x00\n":""}${text}`)}:(text,e)=>{this.chat(`${e?"":`@${hc.nick} `}${text}`)},
             hc.cmd == "whisper"
           )
         }
@@ -257,7 +258,7 @@ class Client {
   _COMMAND(cmd, args, info, back, whisper) {
     if (this.command[cmd]) {
       try {
-        back(this.command[cmd].run(args,info,back,whisper));
+        this.command[cmd].run(args,info,back,whisper);
       } catch (e) {
         back(`命令执行出错：${e.message}`);
       }
