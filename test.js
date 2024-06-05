@@ -1,6 +1,6 @@
 ﻿let Client = require("./HackChat-BotLib.js");
-let client = new Client("wss://hack.chat/chat-ws");
-let join_channel = "your-channel";
+let client = new Client("wss://hack.chat/chat-ws"); //104.131.138.176
+let join_channel = "lounge";
 
 client.onjoin = () => { 
   client.join({
@@ -15,20 +15,17 @@ client.onmessage = (raw, json) => {
 }
 
 client.onjoined = () => {
-  client.chat("Hello, world!");
-  let id = client.getcustomId();
-  client.chat("UpdateMessage Test",id);
-  setTimeout(()=>{
-    client.updatemessage(id,'overwrite','good')
-  },3000);
-  console.log("加入成功");
+  client.chat("Hello, World!");
 }
 
-client.ping = 10000;
-client.onchangechannel = (channel) => {
-  client.close("被踢出或者移动到了"+channel);
-}
-
-client.onclose = (reason) => {
-  console.log(`连接断开`,reason)
+client.onmessage = (raw, json) => {
+  if (json.cmd == "chat" && json.text.includes("6") && json.nick !== client.nick) {
+    let id = client.getcustomId()
+    client.chat(client.reply(json),id);
+    ["我注意到","你说了", "一句“6”","，","最近你", "过得如何？"].forEach((t,i)=>{
+      setTimeout(()=>{
+        client.updatemessage(id,'append',t);
+      },i*3000)
+    })
+  }
 }

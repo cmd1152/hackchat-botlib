@@ -126,12 +126,27 @@ class Client {
         hc.nick = updateBy.nick;
         hc.trip = updateBy.trip;
       }
+      if (this.cmdstart !== false) {
+        let originText = hc.text;
+        if (hc.cmd == "whisper") originText = hc.msg; //前面有扩展;
+        if (originText.startsWith(this.cmdstart)) {
+          let originCmd = originText.substring(this.cmdstart.length).split(" ");
+          let runcmd = originCmd.shift();
+          this._COMMAND(
+            runcmd,
+            originCmd,
+            this.selNick(hc.nick),
+            hc.cmd == "whisper"?(text,e=false)=>{this.whisper(hc.nick,`${e?"\x00\n":""}${text}`)}:(text,e)=>{this.chat(`${e?"":`@{hc.nick} `}${text}`)},
+            hc.cmd == "whisper"
+          )
+        }
+      }
       this.onmessage(event.data,hc);
     }
     ["onclose","onchangechannel","joinfailed","oncaptcha","onjoin","onjoined","onmessage"].forEach(func=>{
       this[func] = () => {}
     });
-    ["channel","nick","joined","ping","pingtime","check"].forEach(ve=>{
+    ["channel","nick","joined","ping","pingtime","check","cmdstart","command"].forEach(ve=>{
       this[ve] = false
     });
     this.customId = 0;
@@ -211,6 +226,42 @@ class Client {
       nick: to,
       text: text
     })
+  }
+  reply(obj) { //来源十字街，有改动
+    let replyText = '';
+    let originalText = args.text;
+    let overlongText = false;
+    if (originalText.length > 152) {
+      replyText = originalText.slice(0, 152);
+      overlongText = true;
+    }
+    if (args.trip) {
+      replyText = '>' + args.trip + ' ' + args.nick + '：\n';
+    } else {
+      replyText = '>' + args.nick + '：\n';
+    }
+    originalText = originalText.split('\n');
+    if (originalText.length >= 8) {
+      originalText = originalText.slice(0, 8);
+      overlongText = true;
+    }
+    for (let replyLine of originalText) {
+      if (!replyLine.startsWith('>>')) replyText += '>' + replyLine + '\n';
+    }
+    if (overlongText) replyText += '>……\n';
+    replyText += '\n';
+    var nick = args.nick
+    replyText += '@' + nick + ' ';
+    return replyText;
+  }
+  _COMMAND(cmd, args, info, back, whisper) {
+    if (this.command[cmd]) {
+      try {
+        back(this.command[cmd].run(args,info,back,whisper));
+      } catch (e) {
+        back(`命令执行出错：${e.message}`);
+      }
+    } else back("命令未找到");
   }
 }
 
