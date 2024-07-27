@@ -1,5 +1,5 @@
 ﻿let Client = require("./HackChat-BotLib.js");
-let client = new Client("wss://hack.chat/chat-ws"); //104.131.138.176
+let client = new Client(); //104.131.138.176
 let join_channel = "lounge";
 
 client.onjoin = () => { 

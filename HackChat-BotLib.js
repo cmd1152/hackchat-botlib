@@ -14,7 +14,7 @@ for (let module in modules) {
 }
 
 class Client {
-  constructor(server_ip) {
+  constructor(server_ip="wss://hack.chat/chat-ws") {
     this._ws = server_ip == "wss://hack.chat/chat-ws" ? 
       new WebSocket('wss://104.131.138.176/chat-ws', {
         headers: {
