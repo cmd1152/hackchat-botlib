@@ -1,20 +1,28 @@
 ﻿let modules = {
-  "WebSocket" : "ws"
+  "WebSocket" : "ws",
+  "https": "https"
 }
+
 for (let module in modules) {
   let module_name = module;
   let module_path = modules[module_name];
   try {
-    require(module_path);
+    global[module_name] = require(module_path);
   } catch (e) {
     throw new Error(`导入${module_name}失败（位于${module_path}）`)
   }
-  global[module_name] = require(module_path);
 }
 
 class Client {
   constructor(server_ip) {
-    this._ws = new WebSocket(server_ip);
+    this._ws = server_ip == "wss://hack.chat/chat-ws" ? 
+      new WebSocket('wss://104.131.138.176/chat-ws', {
+        headers: {
+          host: 'hack.chat'  // 反DNS污染
+        },
+        rejectUnauthorized: false
+      }):
+      new WebSocket(server_ip)
     this._ws.onopen = () => {
       this.onjoin();
     }
