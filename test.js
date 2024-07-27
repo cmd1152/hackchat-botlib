@@ -15,7 +15,13 @@ client.onmessage = (raw, json) => {
 }
 
 client.onjoined = () => {
-  client.chat("Hello, World!");
+  let id = client.getcustomId();
+  client.chat("（请允许UpdateMessage）",id);
+  ["我是一个基于 HackChat-BotLib.js 制作的机器人","临时运行在 Zhang 的服务器上","只是测试 :)","发送 `:test` 测试"].forEach((t,i)=>{
+    setTimeout(()=>{
+      client.updatemessage(id,'overwrite',t);
+    },i*3000)
+  })
 }
 
 client.onmessage = (raw, json) => {

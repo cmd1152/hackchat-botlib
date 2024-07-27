@@ -262,7 +262,7 @@ class Client {
       } catch (e) {
         back(`命令执行出错：${e.message}`);
       }
-    } else back("命令未找到");
+    }
   }
 }
 
