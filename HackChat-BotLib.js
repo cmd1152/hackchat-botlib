@@ -3,6 +3,16 @@
   "https": "https"
 }
 
+let rl_text = [
+  "You are joining channels too fast. Wait a moment and try again.",
+  "You are changing colors too fast. Wait a moment before trying again.",
+   "You are sending invites too fast. Wait a moment before trying again.",
+  "You are changing nicknames too fast. Wait a moment before trying again.",
+  "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message.",
+  "You are rate-limited or blocked.",
+]
+
+
 for (let module in modules) {
   let module_name = module;
   let module_path = modules[module_name];
@@ -68,6 +78,7 @@ class Client {
         this.check = false;
         return;
       }
+      if (hc.cmd == "warn" && rl_text.includes(hc.text)) this.onratelimit(hc.text)
       if (hc.cmd == "onlineSet") {
         this.users = hc.users
         this.nicks = hc.nicks
@@ -152,7 +163,7 @@ class Client {
       }
       this.onmessage(event.data,hc);
     }
-    ["onclose","onchangechannel","joinfailed","oncaptcha","onjoin","onjoined","onmessage"].forEach(func=>{
+    ["onclose","onchangechannel","joinfailed","oncaptcha","onjoin","onjoined","onmessage","onratelimit"].forEach(func=>{
       this[func] = () => {}
     });
     ["channel","nick","joined","ping","pingtime","check","cmdstart","command"].forEach(ve=>{
